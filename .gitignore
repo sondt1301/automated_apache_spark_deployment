@@ -1,2 +1,5 @@
 # Account key
 terraform-key.json
+
+terraform.tfstate.backup
+terraform.tfvars

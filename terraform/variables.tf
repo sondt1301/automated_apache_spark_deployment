@@ -19,3 +19,9 @@ variable "credentials_file" {
     description = "Local path to the service account key"
     type = string
 }
+
+variable "instance_image" {
+    description = "Instance image for VM"
+    type = string
+    default = "ubuntu-os-cloud/ubuntu-2204-lts"
+}

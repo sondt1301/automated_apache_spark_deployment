@@ -37,14 +37,13 @@ resource "google_compute_instance" "master" {
   	zone         = var.zone
   	boot_disk {
     	initialize_params {
-      		image = "ubuntu-os-cloud/ubuntu-2204-lts"
+      		image = var.instance_image
       		size  = 20
     	}
   	}
   	network_interface {
     	network    = google_compute_network.vpc_network.id
     	subnetwork = google_compute_subnetwork.subnet.id
-    	access_config {}
   	}
   	metadata = {
     	ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
@@ -59,14 +58,54 @@ resource "google_compute_instance" "workers" {
   	zone         = var.zone
   	boot_disk {
     	initialize_params {
-      		image = "ubuntu-os-cloud/ubuntu-2204-lts"
+      		image = var.instance_image
       		size  = 20
     	}
   	}
   	network_interface {
     	network    = google_compute_network.vpc_network.id
     	subnetwork = google_compute_subnetwork.subnet.id
+  	}
+	metadata = {
+    	ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
+  	}
+}
+
+# Edge node
+resource "google_compute_instance" "edge" {
+  	name         = "edge-node"
+  	machine_type = "e2-small"
+  	zone         = var.zone
+  	boot_disk {
+    	initialize_params {
+      		image = var.instance_image
+      		size  = 10
+    	}
+  	}
+  	network_interface {
+    	network    = google_compute_network.vpc_network.id
+    	subnetwork = google_compute_subnetwork.subnet.id
     	access_config {}
+  	}
+	metadata = {
+    	ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
+  	}
+}
+
+# Storage node
+resource "google_compute_instance" "storage" {
+  	name         = "storage-node"
+  	machine_type = "e2-medium"
+  	zone         = var.zone
+  	boot_disk {
+    	initialize_params {
+      		image = var.instance_image
+      		size  = 50
+    	}
+  	}
+  	network_interface {
+    	network    = google_compute_network.vpc_network.id
+    	subnetwork = google_compute_subnetwork.subnet.id
   	}
 	metadata = {
     	ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"

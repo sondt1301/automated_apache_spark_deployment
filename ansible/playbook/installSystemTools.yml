@@ -1,0 +1,33 @@
+---
+- name: Install system tools 
+  hosts: all
+  become: true
+
+  vars:
+    system_tools:
+        - python3
+        - python3-pip
+        - wget
+        - curl
+        - tar
+        - ssh
+        - net-tools
+        - software-properties-common
+        - vim
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Intall all system tools
+      apt:
+        name: "{{ system_tools }}"
+        state: present
+
+    - name: Verify python
+      command: python3 --version
+      register: verify_python
+
+    - debug:
+        var: verify_python.stdout

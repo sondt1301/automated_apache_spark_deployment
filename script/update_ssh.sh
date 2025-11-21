@@ -15,12 +15,16 @@ Host 10.0.*.*
     ProxyJump edge
     User ubuntu
     IdentityFile ~/.ssh/id_rsa
+    StrictHostKeyChecking no
+    UserKnownHostsFile=/dev/null
 EOF
 
 echo "Updated ~/.ssh/gcp_spark_cluster with EDGE_IP=$EDGE_IP"
 
 cd -
 
+# Remove old host key
+ssh-keygen -f ~/.ssh/known_hosts -R $EDGE_IP 2>/dev/null
 # Copy ssh private key to edge node
 echo "Copying ssh key to edge node"
 scp -o StrictHostKeyChecking=no ~/.ssh/id_rsa ~/.ssh/id_rsa.pub ubuntu@$EDGE_IP:~/.ssh/

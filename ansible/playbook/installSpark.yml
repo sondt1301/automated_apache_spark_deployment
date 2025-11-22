@@ -1,0 +1,39 @@
+---
+- name: Install spark 
+  hosts: all
+  become: yes
+
+  vars:
+    spark_url: "https://hagimont.freeboxos.fr/hagimont/software/spark-2.4.3-bin-hadoop2.7.tgz"
+    spark_install_dir: "/opt/spark"
+
+  tasks:
+    - name: Create spark directory
+      file:
+        path: "{{ spark_install_dir }}"
+        state: directory
+        mode: 0755
+
+    - name: Download spark 
+      get_url:
+        url: "{{ spark_url }}"
+        dest: "/tmp/spark.tgz"
+        mode: '0644'
+
+    - name: Extract spark package
+      unarchive:
+        src: "/tmp/spark.tgz"
+        dest: "{{ spark_install_dir }}"
+        remote_src: yes
+
+    - name: Set SPARK_HOME in .bashrc
+      lineinfile:
+        path: /home/ubuntu/.bashrc
+        line: 'export SPARK_HOME={{ spark_install_dir }}/spark-2.4.3-bin-hadoop2.7'
+        insertafter: EOF
+
+    - name: Add spark to PATH
+      lineinfile:
+        path: /home/ubuntu/.bashrc
+        line: 'export PATH=$SPARK_HOME/bin:$SPARK_HOME/sbin:$PATH'
+        insertafter: EOF

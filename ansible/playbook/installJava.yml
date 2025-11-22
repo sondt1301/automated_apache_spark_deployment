@@ -1,0 +1,39 @@
+---
+- name: Install java 8
+  hosts: all
+  become: yes
+
+  vars:
+    java_url: "https://hagimont.freeboxos.fr/hagimont/software/jdk-8u202-linux-x64.tar.gz"
+    java_install_dir: "/opt/java"
+
+  tasks:
+    - name: Create java directory
+      file:
+        path: "{{ java_install_dir }}"
+        state: directory
+        mode: 0755
+
+    - name: Download JDK
+      get_url:
+        url: "{{ java_url }}"
+        dest: "/tmp/jdk8.tar.gz"
+        mode: '0644'
+
+    - name: Extract java package
+      unarchive:
+        src: "/tmp/jdk8.tar.gz"
+        dest: "{{ java_install_dir }}"
+        remote_src: yes
+
+    - name: Set JAVA_HOME in .bashrc
+      lineinfile:
+        path: /home/ubuntu/.bashrc
+        line: 'export JAVA_HOME={{ java_install_dir }}/jdk1.8.0_202'
+        insertafter: EOF
+
+    - name: Add java to PATH
+      lineinfile:
+        path: /home/ubuntu/.bashrc
+        line: 'export PATH=$JAVA_HOME/bin:$PATH'
+        insertafter: EOF

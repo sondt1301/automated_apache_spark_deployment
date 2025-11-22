@@ -1,0 +1,32 @@
+---
+- name: Fix spark permissions 
+  hosts: all
+  become: yes
+  become_user: root
+  tasks:
+    - name: Ensure /opt/spark is owned by ubuntu
+      file:
+        path: /opt/spark
+        owner: ubuntu
+        group: ubuntu
+        recurse: yes
+
+- name: Start spark master
+  hosts: master
+  become: no
+  become_user: ubuntu
+  tasks:
+    - name: Stop master if running
+      shell: "sudo -u ubuntu /opt/spark/spark-2.4.3-bin-hadoop2.7/sbin/stop-master.sh || true"
+    - name: Start master
+      shell: "sudo -u ubuntu /opt/spark/spark-2.4.3-bin-hadoop2.7/sbin/start-master.sh"
+
+- name: Start spark workers
+  hosts: workers
+  become: no
+  become_user: ubuntu
+  tasks:
+    - name: Stop slave if running
+      shell: "/opt/spark/spark-2.4.3-bin-hadoop2.7/sbin/stop-slave.sh || true"
+    - name: Start worker
+      shell: "/opt/spark/spark-2.4.3-bin-hadoop2.7/sbin/start-slave.sh spark://{{ hostvars['master-node']['ansible_host'] }}:7077"

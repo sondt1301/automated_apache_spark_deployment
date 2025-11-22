@@ -1,0 +1,16 @@
+---
+- name: Configure spark workers
+  hosts: workers
+  become: yes
+
+  vars:
+    spark_conf_dir: "/opt/spark/spark-2.4.3-bin-hadoop2.7/conf"
+
+  tasks:
+    - name: Copy spark-env.sh
+      copy:
+        dest: "{{ spark_conf_dir }}/spark-env.sh"
+        mode: 0755
+        content: |
+          export JAVA_HOME=/opt/java/jdk1.8.0_202
+          export SPARK_WORKER_MEMORY=2g

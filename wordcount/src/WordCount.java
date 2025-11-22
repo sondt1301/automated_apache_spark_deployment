@@ -9,8 +9,8 @@ import scala.Tuple2;
 
 public class WordCount {
     public static void main(String[] args) {
-        String inputFile = "filesample.txt";
-        String outputFile = "result";
+        String inputFile = args[0];
+        String outputFile = args[1];
         SparkConf conf = new SparkConf().setAppName("WordCount");
         JavaSparkContext sc = new JavaSparkContext(conf);
         long t1 = System.currentTimeMillis();

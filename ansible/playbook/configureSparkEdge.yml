@@ -1,6 +1,6 @@
 ---
-- name: Configure spark workers
-  hosts: workers
+- name: Configure spark edge node
+  hosts: edge
   become: yes
 
   vars:
@@ -10,31 +10,16 @@
     gcs_connector_url: "https://storage.googleapis.com/hadoop-lib/gcs/gcs-connector-{{ gcs_connector_version }}.jar"
 
   tasks:
-    - name: Copy spark-env.sh
-      copy:
-        dest: "{{ spark_conf_dir }}/spark-env.sh"
-        mode: 0755
-        content: |
-          export JAVA_HOME=/opt/java/jdk1.8.0_202
-          export SPARK_WORKER_MEMORY=2g
-
-    - name: Ensure Spark jars directory exists
-      file:
-        path: "{{ spark_jars_dir }}"
-        state: directory
-        owner: ubuntu
-        group: ubuntu
-
-    - name: Download GCS connector JAR on master
+    - name: Download GCS connector JAR
       get_url:
         url: "{{ gcs_connector_url }}"
-        dest: "{{ spark_jars_dir }}/gcs-connector-{{ gcs_connector_version }}.jar"
-        mode: '0644'
-        force: no
+        dest: "{{ spark_jars_dir }}/gcs-connector.jar"
+        mode: "0644"
 
-    - name: Configure core-site.xml for GCS access (master)
+    - name: Configure core-site.xml for GCS access
       copy:
         dest: "{{ spark_conf_dir }}/core-site.xml"
+        mode: "0644"
         content: |
           <configuration>
             <property>
@@ -46,6 +31,3 @@
               <value>com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS</value>
             </property>
           </configuration>
-        owner: ubuntu
-        group: ubuntu
-        mode: '0644'

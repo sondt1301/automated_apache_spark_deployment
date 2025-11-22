@@ -3,3 +3,4 @@ terraform-key.json
 
 terraform.tfstate.backup
 terraform.tfvars
+filesample.txtwordcount/input/filesample.txt

@@ -35,6 +35,7 @@ resource "google_compute_instance" "master" {
 	name         = "spark-master"
 	machine_type = "e2-medium"
   	zone         = var.zone
+	allow_stopping_for_update = true
   	boot_disk {
     	initialize_params {
       		image = var.instance_image
@@ -48,6 +49,11 @@ resource "google_compute_instance" "master" {
   	metadata = {
     	ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
   	}
+	service_account {
+		email = "default"
+		scopes = ["https://www.googleapis.com/auth/devstorage.full_control"]
+	}
+
 }
 
 # Worker nodes
@@ -56,6 +62,7 @@ resource "google_compute_instance" "workers" {
   	name         = "spark-worker-${count.index}"
   	machine_type = "e2-medium"
   	zone         = var.zone
+	allow_stopping_for_update = true
   	boot_disk {
     	initialize_params {
       		image = var.instance_image
@@ -69,6 +76,10 @@ resource "google_compute_instance" "workers" {
 	metadata = {
     	ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
   	}
+	service_account {
+		email = "default"
+		scopes = ["https://www.googleapis.com/auth/devstorage.full_control"]
+	}
 }
 
 # Edge node
@@ -76,6 +87,7 @@ resource "google_compute_instance" "edge" {
   	name         = "edge-node"
   	machine_type = "e2-small"
   	zone         = var.zone
+	allow_stopping_for_update = true
   	boot_disk {
     	initialize_params {
       		image = var.instance_image
@@ -90,6 +102,10 @@ resource "google_compute_instance" "edge" {
 	metadata = {
     	ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
   	}
+	service_account {
+		email = "default"
+		scopes = ["https://www.googleapis.com/auth/devstorage.full_control"]
+	}
 }
 
 # Storage node
@@ -97,6 +113,7 @@ resource "google_compute_instance" "storage" {
   	name         = "storage-node"
   	machine_type = "e2-medium"
   	zone         = var.zone
+	allow_stopping_for_update = true
   	boot_disk {
     	initialize_params {
       		image = var.instance_image
@@ -110,4 +127,8 @@ resource "google_compute_instance" "storage" {
 	metadata = {
     	ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
   	}
+	service_account {
+		email = "default"
+		scopes = ["https://www.googleapis.com/auth/devstorage.full_control"]
+	}
 }

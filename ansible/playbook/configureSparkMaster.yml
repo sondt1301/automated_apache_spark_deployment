@@ -5,6 +5,9 @@
 
   vars:
     spark_conf_dir: "/opt/spark/spark-2.4.3-bin-hadoop2.7/conf"
+    spark_jars_dir: "/opt/spark/spark-2.4.3-bin-hadoop2.7/jars"
+    gcs_connector_version: "hadoop2-2.2.5"
+    gcs_connector_url: "https://storage.googleapis.com/hadoop-lib/gcs/gcs-connector-{{ gcs_connector_version }}.jar"
 
   tasks:
     - name: Copy spark-env.sh
@@ -15,3 +18,35 @@
           export JAVA_HOME=/opt/java/jdk1.8.0_202
           export SPARK_MASTER_HOST={{ ansible_host }}
           export SPARK_WORKER_MEMORY=2g
+
+    - name: Ensure Spark jars directory exists on workers
+      file:
+        path: "{{ spark_jars_dir }}"
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+
+    - name: Download GCS connector JAR on workers
+      get_url:
+        url: "{{ gcs_connector_url }}"
+        dest: "{{ spark_jars_dir }}/gcs-connector-{{ gcs_connector_version }}.jar"
+        mode: '0644'
+        force: no
+
+    - name: Configure core-site.xml for GCS access (workers)
+      copy:
+        dest: "{{ spark_conf_dir }}/core-site.xml"
+        content: |
+          <configuration>
+            <property>
+              <name>fs.gs.impl</name>
+              <value>com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem</value>
+            </property>
+            <property>
+              <name>fs.AbstractFileSystem.gs.impl</name>
+              <value>com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS</value>
+            </property>
+          </configuration>
+        owner: ubuntu
+        group: ubuntu
+        mode: '0644'
